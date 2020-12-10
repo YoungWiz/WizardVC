@@ -2,6 +2,14 @@ package functions;
 
 import java.io.*;
 
+/*
+* 待完成的任务：
+* 1. 使用git的存储结构
+* 2. 将文件的存取方法封装
+* 3. 文件的二进制读写
+*
+*
+* */
 public class KeyValueStore {
 
     //初始化时，在当前目录新建用于保存文件的objects文件夹
