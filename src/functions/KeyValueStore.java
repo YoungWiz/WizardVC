@@ -2,43 +2,49 @@ package functions;
 
 import java.io.*;
 
-/*
-* 待完成的任务：
-* 1. 使用git的存储结构
-* 2. 将文件的存取方法封装
-* 3. 文件的二进制读写
-*
-*
-* */
 public class KeyValueStore {
 
-    //初始化时，在当前目录新建用于保存文件的objects文件夹
+    // 初始化时，在当前目录新建用于保存文件的objects文件夹
     public static void Initialize() {
-        File root = new File("./objects");
-        if (!root.exists())
-            root.mkdir();
+        MakeDir("./objects");
     }
 
-    //给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
+    // 创建文件夹的方法
+    public static void MakeDir(String path) {
+        File folder = new File(path);
+        if (!folder.exists())
+            folder.mkdir();
+    }
+
+    // 创建文件的方法
+    public static void CreateFile(String path) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+    }
+
+    // 给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
     public static String StoreValue(String value) {
         // 初始化objects文件夹
         KeyValueStore.Initialize();
         String hashcode = null;
 
         try {
-            String filename = null;
-            //以txt格式保存文件内容
+            String foldername, filename = null;
+            // 以git的存储结构保存object
             hashcode = Hashcode.GetHashCode(value);
-            filename = hashcode + ".txt";
-            String filepath = "./objects/" + filename;
+            foldername = hashcode.substring(0, 2);
+            filename = hashcode.substring(2);
+            String filepath = "./objects/" + foldername + "/" + filename;
 
-            //创建文件
-            File file = new File(filepath);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
+            // 创建文件夹
+            MakeDir("./objects/" + foldername);
 
-            //写入文件内容
+            // 创建文件
+            CreateFile(filepath);
+
+            // 写入文件内容
             BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
             out.write(value);
             out.close();
@@ -48,16 +54,16 @@ public class KeyValueStore {
         return hashcode;
     }
 
-    //根据文件的hash值(key)返回文件内容
+    // 根据文件的hash值(key)返回文件内容
     public static String ReturnValue(String key) {
-        String filepath = "./objects/" + key + ".txt";
+        String filepath = "./objects/" + key.substring(0, 2) + "/" + key.substring(2);
         StringBuffer sb = new StringBuffer();
 
         try {
             BufferedReader in = new BufferedReader(new FileReader(filepath));
             String temp = null;
 
-            //读入文件内容
+            // 读入文件内容
             temp = in.readLine();
             while (temp != null) {
                 sb.append(temp + " ");
@@ -71,6 +77,7 @@ public class KeyValueStore {
 
     }
 
+    // 测试
     public static void main(String[] args) {
         String test = "测试12345";
         String key = KeyValueStore.StoreValue(test);
