@@ -1,8 +1,10 @@
 package object;
 
 import functions.Hash;
+import functions.KeyValueStore;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.MessageDigest;
 
 /*
@@ -12,22 +14,31 @@ import java.security.MessageDigest;
 public class Tree extends KVObject {
 
     private final String filepath;
-    private final File[] files;
+    private final KVObject[] objects;
 
     // 根据路径创建tree对象
     public Tree(String path) {
         objectType = "tree";
         filepath = path;
         filename = filepath.substring(filepath.lastIndexOf(File.separator));
-        File dir = new File(filepath);
-        files = dir.listFiles();
+
+        File root = new File(filepath);
+        File[] files = root.listFiles();
+        objects = new KVObject[files.length];
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
+                objects[i] = new Tree(files[i]);
+            }
+            if (files[i].isFile()) {
+                objects[i] = new Blob(files[i]);
+            }
+        }
 
         // 计算tree对象的hash值
-        File treeRoot = new File(filepath);
         MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-1");
-            Hash.treeHash(treeRoot, md);
+            Hash.treeHash(root, md);
             key = Hash.digest(md);
         } catch (Exception e) {
             e.printStackTrace();
@@ -39,15 +50,24 @@ public class Tree extends KVObject {
         objectType = "tree";
         filepath = file.getAbsolutePath();
         filename = file.getName();
-        File dir = new File(filepath);
-        files = dir.listFiles();
+
+        File root = new File(filepath);
+        File[] files = root.listFiles();
+        objects = new KVObject[files.length];
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
+                objects[i] = new Tree(files[i]);
+            }
+            if (files[i].isFile()) {
+                objects[i] = new Blob(files[i]);
+            }
+        }
 
         // 计算tree对象的hash值
-        File treeRoot = new File(filepath);
         MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-1");
-            Hash.treeHash(treeRoot, md);
+            Hash.treeHash(root, md);
             key = Hash.digest(md);
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,13 +78,22 @@ public class Tree extends KVObject {
         return filepath;
     }
 
-    public File[] getFiles() {
-        return files;
+    public KVObject[] getObjects() {
+        return objects;
     }
 
     @Override
     public void store() {
+        try {
+            KeyValueStore.treeStore(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    public String toString() {
+        return objectType + " " + key + "\t" + filename;
     }
 
 }

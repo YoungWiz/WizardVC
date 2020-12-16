@@ -9,7 +9,7 @@ import java.security.MessageDigest;
 
 /*
  * 待完成的任务：
- * 1. 实现toString方法
+ *
  * */
 public class Blob extends KVObject {
 
@@ -25,7 +25,7 @@ public class Blob extends KVObject {
             e.printStackTrace();
             return;
         }
-        filename = filepath.substring(filepath.lastIndexOf(File.separator));
+        filename = filepath.substring(filepath.lastIndexOf(File.separator) + 1);
     }
 
     // 根据File对象创建blob的方法
@@ -58,6 +58,6 @@ public class Blob extends KVObject {
 
     @Override
     public String toString () {
-        return objectType;
+        return objectType + " " + key + "\t" + filename;
     }
 }

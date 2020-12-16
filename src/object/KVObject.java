@@ -5,8 +5,12 @@ public abstract class KVObject {
     protected String key;
     protected String filename;
 
-    public String getType() {
-        return objectType;
+    public boolean isBlob() {
+        return objectType == "blob";
+    }
+
+    public boolean isTree() {
+        return objectType == "tree";
     }
 
     public String getKey() {
