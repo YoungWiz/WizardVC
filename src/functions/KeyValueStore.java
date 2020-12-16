@@ -1,6 +1,7 @@
 package functions;
 
 import object.Blob;
+import object.Commit;
 import object.KVObject;
 import object.Tree;
 
@@ -9,11 +10,12 @@ import java.io.*;
 /*
  * 待完成任务：
  * 1. 以二进制方式存取文件
- * 2. tree的存储
+ * 2. 优化文件读取，减少内存占用
  * */
 public class KeyValueStore {
 
-    private static final String objectsPath = File.separator + "wvc" + File.separator + "objects" + File.separator;
+    private static final String wvcRootPath = File.separator + "wvc" + File.separator;
+    private static final String objectsPath = wvcRootPath + "objects" + File.separator;
     private static String workingDirectory = null;
 
     private KeyValueStore() {
@@ -22,6 +24,10 @@ public class KeyValueStore {
     // 设置工作区目录的方法
     public static void setWorkingDirectory(String wd) {
         workingDirectory = wd;
+    }
+
+    public static String getWvcRootPath() {
+        return wvcRootPath;
     }
 
     // 初始化时，在当前目录新建用于保存文件的objects文件夹
@@ -124,11 +130,19 @@ public class KeyValueStore {
         BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
         out.write(tree.toString() + "\n");
         for (KVObject i : objects) {
-                out.write(i.toString() + "\n");
-            }
+            out.write(i.toString() + "\n");
+        }
         out.flush();
         out.close();
-        }
+    }
+
+    public static void commitStore(Commit commit) throws IOException {
+        String filepath = creteObjectFile(commit.getKey());
+        BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
+        out.write(commit.toString());
+        out.flush();
+        out.close();
+    }
 
     // 给定文件目录，将目录下的文件转化为tree和blob并保存
     public static void convert(String filepath) throws IOException {

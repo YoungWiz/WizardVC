@@ -1,15 +1,8 @@
 package functions;
 
-import object.Tree;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
-
-/*
-* 待完成的任务：
-* 1. 计算tree对象的hash
-* */
 
 public class Hash {
 
