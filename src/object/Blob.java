@@ -7,10 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 
-/*
- * 待完成的任务：
- *
- * */
 public class Blob extends KVObject {
 
     private final String filepath;
@@ -25,7 +21,7 @@ public class Blob extends KVObject {
             e.printStackTrace();
             return;
         }
-        filename = filepath.substring(filepath.lastIndexOf(File.separator) + 1);
+        filename = filepath.substring(filepath.lastIndexOf(File.separator));
     }
 
     // 根据File对象创建blob的方法
@@ -57,7 +53,7 @@ public class Blob extends KVObject {
     }
 
     @Override
-    public String toString () {
+    public String toString() {
         return objectType + " " + key + "\t" + filename;
     }
 }

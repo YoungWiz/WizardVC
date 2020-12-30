@@ -7,10 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 
-/*
- * 待完成的任务：
- * 1. 实现toString方法
- * */
 public class Tree extends KVObject {
 
     private final String filepath;
