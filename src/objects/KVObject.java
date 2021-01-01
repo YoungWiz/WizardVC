@@ -1,4 +1,4 @@
-package object;
+package objects;
 
 public abstract class KVObject {
     protected String objectType;
@@ -23,5 +23,4 @@ public abstract class KVObject {
 
     public void store() {
     }
-
 }

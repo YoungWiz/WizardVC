@@ -1,9 +1,7 @@
-package functions;
+package utils;
 
-import object.Blob;
-import object.Commit;
-import object.KVObject;
-import object.Tree;
+import objects.Blob;
+import objects.Tree;
 
 import java.io.*;
 
@@ -16,14 +14,11 @@ public class KeyValueStore {
 
     private static final String wvcRootPath = File.separator + "wvc" + File.separator;
     private static final String objectsPath = wvcRootPath + "objects" + File.separator;
+    private static final String refsPath = wvcRootPath + "refs" + File.separator;
+    private static final String logsPath = wvcRootPath + "logs" + File.separator;
     private static String workingDirectory = null;
 
     private KeyValueStore() {
-    }
-
-    // 设置工作区目录的方法
-    public static void setWorkingDirectory(String wd) {
-        workingDirectory = wd;
     }
 
     public static String getWvcRootPath() {
@@ -33,6 +28,8 @@ public class KeyValueStore {
     // 初始化时，在当前目录新建用于保存文件的objects文件夹
     public static void initialize() {
         makeDirs(workingDirectory + objectsPath);
+        makeDirs(workingDirectory + refsPath);
+        makeDirs(workingDirectory + logsPath);
     }
 
     // 创建文件夹的方法
@@ -66,8 +63,8 @@ public class KeyValueStore {
         return sb.toString();
     }
 
-    // 创建对象文件，并返回对象文件的绝对路径的方法
-    public static String creteObjectFile(String hashcode) throws IOException {
+    // 创建存储KVObjects的文件，并返回对象文件的绝对路径
+    public static String createObjectFile(String hashcode) throws IOException {
         String foldername, filename, folderpath, filepath;
         // 以git的存储结构保存object
         foldername = hashcode.substring(0, 2);
@@ -81,8 +78,15 @@ public class KeyValueStore {
         return filepath;
     }
 
+    public static void writeToFile(String content, String filepath) throws IOException {
+        BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
+        out.write(content);
+        out.flush();
+        out.close();
+    }
+
     // 给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
-    public static String storeValue(String value) {
+    public static String kvStore(String value) {
         // 初始化objects文件夹
         initialize();
         String hashcode = null;
@@ -90,7 +94,7 @@ public class KeyValueStore {
         try {
             // 以git的存储结构保存object
             hashcode = Hash.stringHash(value);
-            String filepath = creteObjectFile(hashcode);
+            String filepath = createObjectFile(hashcode);
 
             // 写入文件内容
             BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
@@ -115,50 +119,22 @@ public class KeyValueStore {
             e.printStackTrace();
         }
         return value;
-
     }
 
-    public static void blobStore(Blob blob) throws IOException {
-        storeValue(readFileContent(blob.getFilepath()));
+    public static String getRefsPath() {
+        return refsPath;
     }
 
-    public static void treeStore(Tree tree) throws IOException {
-        String filepath = creteObjectFile(tree.getKey());
-
-        // 写入tree对象的信息
-        KVObject[] objects = tree.getObjects();
-        BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
-        out.write(tree.toString() + "\n");
-        for (KVObject i : objects) {
-            out.write(i.toString() + "\n");
-        }
-        out.flush();
-        out.close();
+    public static String getLogsPath() {
+        return logsPath;
     }
 
-    public static void commitStore(Commit commit) throws IOException {
-        String filepath = creteObjectFile(commit.getKey());
-        BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
-        out.write(commit.toString());
-        out.flush();
-        out.close();
+    public static String getWorkingDirectory() {
+        return workingDirectory;
     }
 
-    // 给定文件目录，将目录下的文件转化为tree和blob并保存
-    public static void convert(String filepath) throws IOException {
-        File dir = new File(filepath);
-        File[] files = dir.listFiles();
-        for (File i : files) {
-            if (i.isDirectory()) {
-                Tree tree = new Tree(i);
-                tree.store();
-                convert(i.getAbsolutePath());
-            }
-            if (i.isFile()) {
-                Blob blob = new Blob(i);
-                blob.store();
-            }
-        }
+    public static void setWorkingDirectory(String wd) {
+        workingDirectory = wd;
     }
 }
 

@@ -1,7 +1,7 @@
-package object;
+package objects;
 
-import functions.Hash;
-import functions.KeyValueStore;
+import utils.Hash;
+import utils.KeyValueStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class Blob extends KVObject {
     @Override
     public void store() {
         try {
-            KeyValueStore.blobStore(this);
+            KeyValueStore.kvStore(KeyValueStore.readFileContent(this.getFilepath()));
         } catch (IOException e) {
             e.printStackTrace();
         }

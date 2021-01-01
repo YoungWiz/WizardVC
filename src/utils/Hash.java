@@ -1,10 +1,16 @@
-package functions;
+package utils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
 
+/*
+* 待完成的任务：
+* 1. 降低耦合
+* */
 public class Hash {
+    private Hash() {
+    }
 
     // 计算字符串hash值的方法
     public static String stringHash(String content) throws Exception {
@@ -32,8 +38,8 @@ public class Hash {
         input.close();
     }
 
-    public static void treeHash(File treeRoot, MessageDigest md) throws Exception {
-        File[] files = treeRoot.listFiles();
+    public static void dirHash(File file, MessageDigest md) throws Exception {
+        File[] files = file.listFiles();
         for (int i = 0; i < files.length; i++) {
             // 若该对象为文件，则计算该文件的hash值，更新md
             if (files[i].isFile()) {
@@ -41,7 +47,7 @@ public class Hash {
             }
             // 若该对象为文件夹，则递归遍历
             if (files[i].isDirectory()) {
-                treeHash(files[i], md);
+                dirHash(files[i], md);
             }
         }
     }
