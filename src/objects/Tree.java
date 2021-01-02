@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class Tree extends KVObject {
 
     private final String filepath;
-    // 存放tree对象包含的
+    // 存放tree对象包含的objects的arraylist
     private final ArrayList<KVObject> objects = new ArrayList<>();
 
     // 根据路径创建tree对象

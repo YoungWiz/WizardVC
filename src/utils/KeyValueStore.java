@@ -77,24 +77,24 @@ public class KeyValueStore {
     }
 
     // 给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
-    public static String kvStore(String value) {
-        String hashcode = null;
-
-        try {
-            // 以git的存储结构保存object
-            hashcode = Hash.stringHash(value);
-            String filepath = createObjectFile(hashcode);
-
-            // 写入文件内容
-            BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
-            out.write(value);
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return hashcode;
-    }
+//    public static String kvStore(String value) {
+//        String hashcode = null;
+//
+//        try {
+//            // 以git的存储结构保存object
+//            hashcode = Hash.stringHash(value);
+//            String filepath = createObjectFile(hashcode);
+//
+//            // 写入文件内容
+//            BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
+//            out.write(value);
+//            out.flush();
+//            out.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return hashcode;
+//    }
 
     // 根据文件的hash值(key)返回文件内容
     public static String returnValue(String key) {

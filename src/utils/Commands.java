@@ -2,7 +2,6 @@ package utils;
 
 import objects.Blob;
 import objects.Tree;
-import refs.Head;
 import objects.Commit;
 
 import java.io.File;
@@ -15,7 +14,7 @@ public class Commands {
     private Commands() {
     }
 
-    public static void setRootTree(String rootPath){
+    public static void setRootTree(String rootPath) {
         rootTree = new Tree(rootPath);
     }
 

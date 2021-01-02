@@ -4,9 +4,7 @@ import utils.Hash;
 import utils.KeyValueStore;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Date;
 
 /*
@@ -27,7 +25,6 @@ public class Commit extends KVObject {
         this.rootTree = rootTree;
         objectType = "commit";
     }
-
 
 
     public String getParent() {
@@ -52,7 +49,7 @@ public class Commit extends KVObject {
     }
 
     @Override
-    public void store(){
+    public void store() {
         try {
             String objectFilePath = KeyValueStore.createObjectFile(Hash.stringHash(toString()));
             BufferedWriter out = new BufferedWriter(new FileWriter(objectFilePath));
