@@ -47,8 +47,8 @@ public class Branch {
 
     public void store() {
         try {
-            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getRefsPath());
-            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getLogsPath());
+            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getRefsPath(), true);
+            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getLogsPath(), true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,7 +56,12 @@ public class Branch {
 
     // 更新refs指针和log
     public void update() {
-
+        try {
+            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getRefsPath(), true);
+            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getLogsPath(), false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

@@ -11,7 +11,7 @@ public class Head {
 
     public static void update() {
         try {
-            KeyValueStore.writeToFile(workingBranch, headPath);
+            KeyValueStore.writeToFile(workingBranch, headPath, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -144,6 +144,7 @@ public class Commands {
         }
     }
 
+    // 返回当前已有的branch
     public static String listBranches() {
         String listOfBranches = "";
         File[] files = new File(KeyValueStore.getRefsPath()).listFiles();
@@ -157,6 +158,7 @@ public class Commands {
         return listOfBranches;
     }
 
+    // 返回工作区中的文件/文件夹
     public static String listFiles() {
         String listOfFiles = "";
         if (KeyValueStore.getWorkingDirectory() == null) {
@@ -170,11 +172,33 @@ public class Commands {
         return listOfFiles;
     }
 
-    //    public static String log() {
-//
-//    }
+    // 返回log
+    public static String log() {
+        File[] files = new File(KeyValueStore.getLogsPath()).listFiles();
+        if (files == null) {
+            return null;
+        }
 
-    public static void reset(String partialHashCodeOfCommit) {
+        String logs = "";
+        for (File file : files) {
+            try {
+                String commitID = KeyValueStore.readFileContent(file.getAbsolutePath());
+                while (commitID != null) {
+                    String commitContent = KeyValueStore.returnValueByKey(commitID);
+                    logs += commitContent + System.getProperty("line.separator");
+                    int beginIndex = commitContent.indexOf("parent") + 7;
+                    int endIndex = commitContent.indexOf(System.getProperty("line.separator"), beginIndex);
+                    commitID = commitContent.substring(beginIndex, endIndex);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return logs;
+    }
+
+    // 回退到指定的commit
+    public static void reset(String commitID) {
 
     }
 }

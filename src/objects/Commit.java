@@ -53,14 +53,14 @@ public class Commit extends KVObject {
 
     @Override
     public String toString() {
-        return System.getProperty("line.separator") + "parent " + parent + System.getProperty("line.separator") + authorInfo + System.getProperty("line.separator") + date.toString();
+        return System.getProperty("line.separator") + "parent " + parent + System.getProperty("line.separator") + authorInfo + System.getProperty("line.separator") + date.toString() + System.getProperty("line.separator") + message;
     }
 
     @Override
     public void store() {
         try {
             String objectFilePath = KeyValueStore.createObjectFile(this.getKey());
-            KeyValueStore.writeToFile(rootTree.toString() + this.toString(), objectFilePath);
+            KeyValueStore.writeToFile(rootTree.toString() + System.getProperty("line.separator") + this.toString(), objectFilePath, true);
         } catch (Exception e) {
             e.printStackTrace();
         }

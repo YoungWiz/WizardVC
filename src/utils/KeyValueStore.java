@@ -69,11 +69,20 @@ public class KeyValueStore {
         return filepath;
     }
 
-    public static void writeToFile(String content, String filepath) throws IOException {
-        BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
-        out.write(content);
-        out.flush();
-        out.close();
+    // 向文件中写入内容，并根据要求选择是否覆写
+    public static void writeToFile(String content, String filepath, boolean overRide) throws IOException {
+        if (overRide == true) {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
+            out.write(content);
+            out.flush();
+            out.close();
+        } else {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filepath, true));
+            out.write(System.getProperty("line.separator"));
+            out.write(content);
+            out.flush();
+            out.close();
+        }
     }
 
     // 给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
