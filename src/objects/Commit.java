@@ -3,44 +3,52 @@ package objects;
 import utils.Hash;
 import utils.KeyValueStore;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.File;
 import java.util.Date;
 
-/*
- * 待实现的功能：
- * 1. 添加作者信息
- * 2. 添加commit注释
- * */
 public class Commit extends KVObject {
-    private static Tree rootTree;
-    private final Date date;
+    private static String authorInfo = "WizardVC 1.0";
+    private Tree rootTree;
+    private Date date;
     // 储存父提交的hashcode
     private String parent = null;
-    private String authorInfo = "WizardVC 1.0";
     private String message = "a new commit";
 
+    // 根据rootTree创建Commit对象
     public Commit(Tree rootTree) {
         date = new Date();
         this.rootTree = rootTree;
         objectType = "commit";
     }
 
+    // 根据已有Commit的ID创建Commit对象
+    public Commit(String commitID) {
+        String objectFilePath = KeyValueStore.getObjectsPath() + commitID.substring(0, 2) + File.separator + commitID.substring(2);
+    }
+
+    public static void setAuthorInfo(String authorName) {
+        authorInfo = authorName;
+    }
 
     public String getParent() {
         return parent;
+    }
+
+    public String getTreeID() {
+        return rootTree.key;
     }
 
     public void setParent(String parentHashCode) {
         parent = parentHashCode;
     }
 
-    public void setAuthorInfo(String authorInfo) {
-        this.authorInfo = authorInfo;
-    }
-
     public void setMessage(String message) {
         this.message = message;
+        try {
+            this.key = Hash.stringHash(this.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -51,16 +59,10 @@ public class Commit extends KVObject {
     @Override
     public void store() {
         try {
-            String objectFilePath = KeyValueStore.createObjectFile(Hash.stringHash(toString()));
-            BufferedWriter out = new BufferedWriter(new FileWriter(objectFilePath));
-            out.write(rootTree.toString() + this.toString());
-            out.flush();
-            out.close();
-//            convert(rootPath);
+            String objectFilePath = KeyValueStore.createObjectFile(this.getKey());
+            KeyValueStore.writeToFile(rootTree.toString() + this.toString(), objectFilePath);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
 }
