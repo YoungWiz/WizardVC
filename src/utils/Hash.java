@@ -5,9 +5,9 @@ import java.io.FileInputStream;
 import java.security.MessageDigest;
 
 /*
-* 待完成的任务：
-* 1. 降低耦合
-* */
+ * 待完成的任务：
+ * 1. 降低耦合
+ * */
 public class Hash {
     private Hash() {
     }
@@ -59,7 +59,6 @@ public class Hash {
         for (byte i : sha256) {
             result += (Integer.toString((i >> 4) & 0x0F, 16) + Integer.toString(i & 0x0F, 16));
         }
-
         return result;
     }
 }
