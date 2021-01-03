@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Commands {
-    // 用于存放add过程中已添加的object的arraylist
+    // 用于关联add过程中已添加的object的tree对象，对应工作区的根目录
     private static Tree rootTree;
 
     private Commands() {
@@ -145,23 +145,27 @@ public class Commands {
     }
 
     public static String listBranches() {
-        String listOfBranches = null;
+        String listOfBranches = "";
         File[] files = new File(KeyValueStore.getRefsPath()).listFiles();
-        for (File file : files) {
-            listOfBranches += file.getName() + "\n";
+        if (files == null) {
+            return null;
         }
+        for (File file : files) {
+            listOfBranches += file.getName() + System.getProperty("line.separator");
+        }
+        listOfBranches += "Currently at " + Head.getWorkingBranch();
         return listOfBranches;
     }
 
     public static String listFiles() {
-        String listOfFiles = null;
+        String listOfFiles = "";
         if (KeyValueStore.getWorkingDirectory() == null) {
             System.out.println("failure: Working directory has not been set.");
-            return listOfFiles;
+            return null;
         }
         File[] files = new File(KeyValueStore.getWorkingDirectory()).listFiles();
         for (File file : files) {
-            listOfFiles += file.getName();
+            listOfFiles += file.getName() + System.getProperty("line.separator");
         }
         return listOfFiles;
     }

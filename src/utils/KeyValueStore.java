@@ -47,7 +47,7 @@ public class KeyValueStore {
         // 读取文件内容
         temp = in.readLine();
         while (temp != null) {
-            sb.append(temp + " ");
+            sb.append(temp + System.getProperty("line.separator"));
             temp = in.readLine();
 
         }
@@ -97,7 +97,7 @@ public class KeyValueStore {
 //    }
 
     // 根据文件的hash值(key)返回文件内容
-    public static String returnValue(String key) {
+    public static String returnValueByKey(String key) {
         String filepath = workingDirectory + objectsPath + key.substring(0, 2) + File.separator + key.substring(2);
         String value = null;
 

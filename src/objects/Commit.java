@@ -53,7 +53,7 @@ public class Commit extends KVObject {
 
     @Override
     public String toString() {
-        return "\n" + "parent " + parent + "\n" + authorInfo + "\n" + date.toString();
+        return System.getProperty("line.separator") + "parent " + parent + System.getProperty("line.separator") + authorInfo + System.getProperty("line.separator") + date.toString();
     }
 
     @Override

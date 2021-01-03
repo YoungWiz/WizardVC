@@ -80,9 +80,9 @@ public class Tree extends KVObject {
             objectFilePath = KeyValueStore.createObjectFile(this.getKey());
             // 在存储文件中写入tree包含的objects的信息
             BufferedWriter out = new BufferedWriter(new FileWriter(objectFilePath));
-            out.write(this.toString() + "\n");
+            out.write(this.toString() + System.getProperty("line.separator"));
             for (KVObject i : objects) {
-                out.write(i.toString() + "\n");
+                out.write(i.toString() + System.getProperty("line.separator"));
                 if (i.isTree()){
                     i.store();
                 }
