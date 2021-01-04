@@ -47,7 +47,7 @@ public class Blob extends KVObject {
     public void store() {
         try {
             String objectFilePath = KeyValueStore.createObjectFile(this.getKey());
-            KeyValueStore.writeToFile(KeyValueStore.readFileContent(this.filepath), objectFilePath);
+            KeyValueStore.writeToFile(KeyValueStore.readFileContent(this.filepath), objectFilePath, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

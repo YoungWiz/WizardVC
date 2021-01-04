@@ -38,22 +38,6 @@ public class KeyValueStore {
         }
     }
 
-    // 读取文件内容的方法
-    public static String readFileContent(String filepath) throws IOException {
-        StringBuffer sb = new StringBuffer();
-        BufferedReader in = new BufferedReader(new FileReader(filepath));
-        String temp;
-
-        // 读取文件内容
-        temp = in.readLine();
-        while (temp != null) {
-            sb.append(temp + " ");
-            temp = in.readLine();
-
-        }
-        return sb.toString();
-    }
-
     // 创建存储KVObjects的文件，并返回对象文件的绝对路径
     public static String createObjectFile(String hashcode) throws IOException {
         String foldername, filename, folderpath, filepath;
@@ -69,11 +53,20 @@ public class KeyValueStore {
         return filepath;
     }
 
-    public static void writeToFile(String content, String filepath) throws IOException {
-        BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
-        out.write(content);
-        out.flush();
-        out.close();
+    // 向文件中写入内容，并根据要求选择是否覆写
+    public static void writeToFile(String content, String filepath, boolean overRide) throws IOException {
+        if (overRide == true) {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
+            out.write(content);
+            out.flush();
+            out.close();
+        } else {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filepath, true));
+            out.write(System.getProperty("line.separator"));
+            out.write(content);
+            out.flush();
+            out.close();
+        }
     }
 
     // 给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
@@ -97,8 +90,8 @@ public class KeyValueStore {
 //    }
 
     // 根据文件的hash值(key)返回文件内容
-    public static String returnValue(String key) {
-        String filepath = workingDirectory + objectsPath + key.substring(0, 2) + File.separator + key.substring(2);
+    public static String returnValueByKey(String key) {
+        String filepath = objectsPath + key.substring(0, 2) + File.separator + key.substring(2);
         String value = null;
 
         try {
@@ -108,6 +101,27 @@ public class KeyValueStore {
             e.printStackTrace();
         }
         return value;
+    }
+
+    // 读取文件内容的方法
+    public static String readFileContent(String filepath) throws IOException {
+        StringBuffer sb = new StringBuffer();
+        File file = new File(filepath);
+        if (file.exists()) {
+            BufferedReader in = new BufferedReader(new FileReader(file));
+            String temp;
+
+            // 读取文件内容
+            temp = in.readLine();
+            while (temp != null) {
+                sb.append(temp + System.getProperty("line.separator"));
+                temp = in.readLine();
+            }
+            return sb.toString();
+        } else {
+            System.out.println("Something wrong with the file.");
+        }
+        return null;
     }
 
     public static String getRefsPath() {

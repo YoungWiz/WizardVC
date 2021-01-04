@@ -2,22 +2,31 @@ package refs;
 
 import utils.KeyValueStore;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Branch {
-    private String branchName, refsPath, logsPath, pointTO;
+    private  String branchName, refsPath, logsPath, associatedCommitID;
 
     public Branch(String branchName) throws IOException {
         this.branchName = branchName;
-        String refsPath = KeyValueStore.getRefsPath() + this.branchName;
-        String logsPath = KeyValueStore.getLogsPath() + this.branchName;
-        // 生成存储文件
-        KeyValueStore.createFile(this.getRefsPath());
-        KeyValueStore.createFile(this.getLogsPath());
+        refsPath = KeyValueStore.getRefsPath() + this.branchName;
+        logsPath = KeyValueStore.getLogsPath() + this.branchName;
+
+        File refsFile = new File(refsPath);
+        File logsFile = new File(logsPath);
+
+        // 若refs文件和logs文件均不存在，则生成存储文件；若存在，则对associatedCommitID进行赋值
+        if (!refsFile.exists() && !logsFile.exists()) {
+            KeyValueStore.createFile(this.getRefsPath());
+            KeyValueStore.createFile(this.getLogsPath());
+        } else {
+            associatedCommitID = KeyValueStore.readFileContent(refsPath).replace("\r\n", "");
+        }
     }
 
-    public String getPointTO() {
-        return pointTO;
+    public String getAssociatedCommitID() {
+        return associatedCommitID;
     }
 
     public String getRefsPath() {
@@ -28,10 +37,28 @@ public class Branch {
         return logsPath;
     }
 
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public void setPointTo(String commitID) {
+        associatedCommitID = commitID;
+    }
+
     public void store() {
         try {
-            KeyValueStore.writeToFile(this.getPointTO(), this.getRefsPath());
-            KeyValueStore.writeToFile(this.getPointTO(), this.getLogsPath());
+            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getRefsPath(), true);
+            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getLogsPath(), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 更新refs指针和log
+    public void update() {
+        try {
+            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getRefsPath(), true);
+            KeyValueStore.writeToFile(this.getAssociatedCommitID(), this.getLogsPath(), false);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -11,14 +11,14 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 
 /*
-* 待完成的任务：
-* 1. 改进hashcode的计算方法，每次只对objects中的对象计算hash值
-* */
+ * 待完成的任务：
+ * 1. 改进hashcode的计算方法，每次只对objects中的对象计算hash值
+ * */
 public class Tree extends KVObject {
 
-    private final String filepath;
     // 存放tree对象包含的objects的arraylist
     private final ArrayList<KVObject> objects = new ArrayList<>();
+    private String filepath;
 
     // 根据路径创建tree对象
     public Tree(String path) {
@@ -26,15 +26,6 @@ public class Tree extends KVObject {
         filepath = path;
         filename = filepath.substring(filepath.lastIndexOf(File.separator));
 
-        // 计算tree对象的hash值
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("SHA-1");
-            Hash.dirHash(new File(filepath), md);
-            key = Hash.digest(md);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     // 根据File对象创建tree对象,并在tree对象的objects数组中存入file对应的目录下的所有文件/文件夹
@@ -43,17 +34,6 @@ public class Tree extends KVObject {
         filepath = file.getAbsolutePath();
         filename = file.getName();
 
-//        File root = new File(filepath);
-//        File[] files = root.listFiles();
-//        for (int i = 0; i < files.length; i++) {
-//            if (files[i].isDirectory()) {
-//                objects.add(new Tree(files[i]));
-//            }
-//            if (files[i].isFile()) {
-//                objects.add(new Blob(files[i]));
-//            }
-//        }
-
         // 计算tree对象的hash值
         MessageDigest md;
         try {
@@ -65,12 +45,34 @@ public class Tree extends KVObject {
         }
     }
 
-    public String getFilepath() {
-        return filepath;
+    // 计算tree对象的hash值
+    private void updateHashcode() {
+        ArrayList<File> fileArrayList = new ArrayList<>();
+        for (KVObject object : objects) {
+            if (object.isTree()) {
+                Tree tree = (Tree) object;
+                fileArrayList.add(new File(tree.getFilepath()));
+            }
+            if (object.isBlob()) {
+                Blob blob = (Blob) object;
+                fileArrayList.add(new File(blob.getFilepath()));
+            }
+        }
+        File[] objectsFiles = fileArrayList.toArray(new File[fileArrayList.size()]);
+        key = Hash.arrayHash(objectsFiles);
     }
 
-    public ArrayList<KVObject> getObjects() {
-        return objects;
+    public void addObject(KVObject object) {
+        objects.add(object);
+        updateHashcode();
+    }
+
+    public void clearObjects() {
+        objects.clear();
+    }
+
+    public String getFilepath() {
+        return filepath;
     }
 
     @Override
@@ -80,10 +82,10 @@ public class Tree extends KVObject {
             objectFilePath = KeyValueStore.createObjectFile(this.getKey());
             // 在存储文件中写入tree包含的objects的信息
             BufferedWriter out = new BufferedWriter(new FileWriter(objectFilePath));
-            out.write(this.toString() + "\n");
+            out.write(this.toString() + System.getProperty("line.separator"));
             for (KVObject i : objects) {
-                out.write(i.toString() + "\n");
-                if (i.isTree()){
+                out.write(i.toString() + System.getProperty("line.separator"));
+                if (i.isTree()) {
                     i.store();
                 }
             }
