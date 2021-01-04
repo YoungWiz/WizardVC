@@ -3,6 +3,7 @@ package utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /*
  * 待完成的任务：
@@ -50,6 +51,27 @@ public class Hash {
                 dirHash(files[i], md);
             }
         }
+    }
+
+    // 给定一个存有File对象的数组，递归地计算数据中对象的hashcode并返回
+    public static String arrayHash(File[] files) {
+        MessageDigest messageDigest;
+        String hashcode = null;
+        try {
+            messageDigest= MessageDigest.getInstance("SHA-1");
+            for (File file : files) {
+                if (file.isFile()) {
+                    fileHash(file, messageDigest);
+                }
+                if (file.isDirectory()) {
+                    dirHash(file, messageDigest);
+                }
+            }
+            hashcode = digest(messageDigest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hashcode;
     }
 
     public static String digest(MessageDigest md) {

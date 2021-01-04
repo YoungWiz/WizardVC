@@ -34,10 +34,6 @@ public class Commit extends KVObject {
         return parent;
     }
 
-    public String getTreeID() {
-        return rootTree.key;
-    }
-
     public void setParent(String parentHashCode) {
         parent = parentHashCode;
         try {
@@ -45,6 +41,10 @@ public class Commit extends KVObject {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String getTreeID() {
+        return rootTree.key;
     }
 
     public void setMessage(String message) {
@@ -58,15 +58,15 @@ public class Commit extends KVObject {
 
     @Override
     public String toString() {
-        return "parent " + parent + System.getProperty("line.separator") + authorInfo + System.getProperty("line.separator") + date.toString() + System.getProperty("line.separator") + message;
+        return "commit ID: " + key + System.getProperty("line.separator") + "parent " + parent + System.getProperty("line.separator") + authorInfo + System.getProperty("line.separator") + date.toString() + System.getProperty("line.separator") + message;
     }
 
     @Override
     public void store() {
         try {
+            rootTree.store();
             String objectFilePath = KeyValueStore.createObjectFile(this.getKey());
             KeyValueStore.writeToFile(rootTree.toString() + System.getProperty("line.separator") + this.toString(), objectFilePath, true);
-            System.out.println("Commit " + getKey() + " is stored.");
         } catch (Exception e) {
             e.printStackTrace();
         }

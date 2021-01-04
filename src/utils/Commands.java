@@ -65,13 +65,13 @@ public class Commands {
         // 若add的对象为文件，则直接转化为blob存储
         if (file.isFile()) {
             Blob blob = new Blob(file);
-            rootTree.getObjects().add(blob);
+            rootTree.addObject(blob);
             blob.store();
         }
         // 若add的对象为文件夹，则转化为tree，并递归地存储该文件夹下的文件/文件夹
         if (file.isDirectory()) {
             Tree subTree = new Tree(file);
-            rootTree.getObjects().add(subTree);
+            rootTree.addObject(subTree);
             try {
                 subTree.convert();
             } catch (IOException e) {
@@ -93,7 +93,7 @@ public class Commands {
                 mainBranch.store();
                 newCommit.store();
                 rootTree.store();
-                rootTree.getObjects().clear();
+                rootTree.clearObjects();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -117,7 +117,7 @@ public class Commands {
                 workingBranch.update();
 
                 rootTree.store();
-                rootTree.getObjects().clear();
+                rootTree.clearObjects();
             } catch (IOException e) {
                 e.printStackTrace();
             }
