@@ -107,8 +107,9 @@ public class Commands {
                 String parentTreeID = parentCommitContent.substring(beginIndex, endIndex);
 
                 // 判断本次提交是否有文件发生改动，将本次提交的tree hashcode和上次提交的tree hashcode进行比较，若相同则拒绝提交
-                if (newCommit.getTreeID() == parentTreeID) {
+                if (newCommit.getTreeID().equals(parentTreeID)) {
                     System.out.println("failure: No files changed.");
+                    rootTree.clearObjects();
                     return;
                 }
                 newCommit.setParent(parentCommitID);
@@ -140,7 +141,10 @@ public class Commands {
     }
 
     // 更改当前工作的分支
-    public static void checkOut(String branchName) {
+    public static void switchBranches(String branchName) {
+        if (!rootTree.containsObjects()) {
+            System.out.println("You have uncommitted changes, Please commit them before you switch branches");
+        }
         File file = new File(KeyValueStore.getRefsPath() + branchName);
         if (!file.exists()) {
             System.out.println("failure: Branch '" + branchName + "' did not match any existing branches");
@@ -176,7 +180,7 @@ public class Commands {
         }
         File[] files = new File(KeyValueStore.getWorkingDirectory()).listFiles();
         for (File file : files) {
-            if (file.getName() != "wvc") {
+            if (!file.getName().equals("wvc")) {
                 listOfFiles += file.getName() + System.getProperty("line.separator");
             }
         }
