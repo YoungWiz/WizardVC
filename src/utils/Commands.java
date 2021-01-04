@@ -141,7 +141,7 @@ public class Commands {
     }
 
     // 更改当前工作的分支
-    public static void checkOut(String branchName) {
+    public static void switchBranches(String branchName) {
         if (!rootTree.containsObjects()) {
             System.out.println("You have uncommitted changes, Please commit them before you switch branches");
         }
