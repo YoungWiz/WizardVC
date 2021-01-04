@@ -71,6 +71,13 @@ public class Tree extends KVObject {
         objects.clear();
     }
 
+    public boolean containsObjects() {
+        if (objects.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
     public String getFilepath() {
         return filepath;
     }
