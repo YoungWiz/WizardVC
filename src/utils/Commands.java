@@ -90,24 +90,31 @@ public class Commands {
                 Head.update();
                 mainBranch.store();
                 newCommit.store();
+                rootTree.store();
                 rootTree.getObjects().clear();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                String parentCommitID = new Branch(Head.getWorkingBranch()).getAssociatedCommitID();
-                String parentTreeID = KeyValueStore.readFileContent(KeyValueStore.getObjectsPath() + parentCommitID.substring(0, 2) + File.separator + parentCommitID.substring(2)).substring(5, 46);
+                Branch workingBranch = new Branch(Head.getWorkingBranch());
+                String parentCommitID = workingBranch.getAssociatedCommitID();
+                String parentCommitContent = KeyValueStore.returnValueByKey(parentCommitID);
+                int beginIndex = parentCommitContent.indexOf("tree") + 5;
+                int endIndex = parentCommitContent.indexOf("\t", beginIndex);
+                String parentTreeID = parentCommitContent.substring(beginIndex, endIndex);
+
                 // 判断本次提交是否有文件发生改动，将本次提交的tree hashcode和上次提交的tree hashcode进行比较，若相同则拒绝提交
                 if (newCommit.getTreeID() == parentTreeID) {
                     System.out.println("failure: No files changed.");
                     return;
                 }
-                Branch existingBranch = new Branch(Head.getWorkingBranch());
-                newCommit.setParent(existingBranch.getAssociatedCommitID());
-                existingBranch.setPointTo(newCommit.getKey());
-                existingBranch.update();
+                newCommit.setParent(parentCommitID);
                 newCommit.store();
+                workingBranch.setPointTo(newCommit.getKey());
+                workingBranch.update();
+
+                rootTree.store();
                 rootTree.getObjects().clear();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -173,7 +180,7 @@ public class Commands {
     }
 
     // 返回log
-    public static String log() {
+    public static String getLogs() {
         File[] files = new File(KeyValueStore.getLogsPath()).listFiles();
         if (files == null) {
             return null;

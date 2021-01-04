@@ -21,7 +21,7 @@ public class Branch {
             KeyValueStore.createFile(this.getRefsPath());
             KeyValueStore.createFile(this.getLogsPath());
         } else {
-            associatedCommitID = KeyValueStore.readFileContent(refsPath);
+            associatedCommitID = KeyValueStore.readFileContent(refsPath).replace("\r\n", "");
         }
     }
 
