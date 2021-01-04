@@ -6,7 +6,9 @@ import objects.Commit;
 import refs.Branch;
 import refs.Head;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 public class Commands {
@@ -161,7 +163,7 @@ public class Commands {
         for (File file : files) {
             listOfBranches += file.getName() + System.getProperty("line.separator");
         }
-        listOfBranches += "Currently at " + Head.getWorkingBranch();
+        listOfBranches += "Currently on " + Head.getWorkingBranch();
         return listOfBranches;
     }
 
@@ -174,7 +176,9 @@ public class Commands {
         }
         File[] files = new File(KeyValueStore.getWorkingDirectory()).listFiles();
         for (File file : files) {
-            listOfFiles += file.getName() + System.getProperty("line.separator");
+            if (file.getName() != "wvc") {
+                listOfFiles += file.getName() + System.getProperty("line.separator");
+            }
         }
         return listOfFiles;
     }
@@ -189,13 +193,12 @@ public class Commands {
         String logs = "";
         for (File file : files) {
             try {
-                String commitID = KeyValueStore.readFileContent(file.getAbsolutePath());
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                String commitID = bufferedReader.readLine();
                 while (commitID != null) {
-                    String commitContent = KeyValueStore.returnValueByKey(commitID);
-                    logs += commitContent + System.getProperty("line.separator");
-                    int beginIndex = commitContent.indexOf("parent") + 7;
-                    int endIndex = commitContent.indexOf(System.getProperty("line.separator"), beginIndex);
-                    commitID = commitContent.substring(beginIndex, endIndex);
+                    logs += "Branch: " + file.getName() + System.getProperty("line.separator");
+                    logs += KeyValueStore.returnValueByKey(commitID) + System.getProperty("line.separator");
+                    commitID = bufferedReader.readLine();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

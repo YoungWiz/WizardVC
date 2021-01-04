@@ -107,7 +107,6 @@ public class KeyValueStore {
     public static String readFileContent(String filepath) throws IOException {
         StringBuffer sb = new StringBuffer();
         File file = new File(filepath);
-        System.out.println(filepath);
         if (file.exists()) {
             BufferedReader in = new BufferedReader(new FileReader(file));
             String temp;

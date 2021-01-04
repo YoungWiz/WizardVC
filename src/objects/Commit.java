@@ -40,6 +40,11 @@ public class Commit extends KVObject {
 
     public void setParent(String parentHashCode) {
         parent = parentHashCode;
+        try {
+            this.key = Hash.stringHash(this.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setMessage(String message) {
