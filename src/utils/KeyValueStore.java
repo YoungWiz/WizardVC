@@ -98,8 +98,6 @@ public class KeyValueStore {
                 temp = in.readLine();
             }
             return sb.toString();
-        } else {
-            System.out.println("Something wrong with the file.");
         }
         return null;
     }

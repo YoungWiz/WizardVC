@@ -7,6 +7,7 @@ import refs.Branch;
 import refs.Head;
 
 import java.io.*;
+import java.util.ArrayList;
 
 public class Commands {
     // 用于关联add过程中已添加的object的tree对象，对应工作区的根目录
@@ -26,7 +27,6 @@ public class Commands {
             KeyValueStore.setWorkingDirectory(absolutePath);
         } else {
             System.out.println("Path not found.");
-            return;
         }
     }
 
@@ -85,7 +85,7 @@ public class Commands {
     }
 
     public static void commit(String message) {
-        if (!rootTree.containsObjects()) {
+        if (KeyValueStore.getWorkingDirectory().equals(null) || !rootTree.containsObjects()) {
             System.out.println("No changes added to commit. Use 'wvc add' to add files.");
         }
         Commit newCommit = new Commit(rootTree);
@@ -195,29 +195,34 @@ public class Commands {
         return listOfFiles;
     }
 
-    // 返回log
+    // 返回当前分支的commit history
     public static String getLogs() {
 
-        if (KeyValueStore.getWorkingDirectory() == null || KeyValueStore.getLogsPath() == null) {
+        if (KeyValueStore.getWorkingDirectory() == null || Head.getWorkingBranchPath() == null) {
             return null;
         }
 
-        File[] files = new File(KeyValueStore.getLogsPath()).listFiles();
-        String logs = "";
-        for (File logFile : files) {
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new FileReader(logFile));
-                String commitID = bufferedReader.readLine();
-                while (commitID != null) {
-                    logs += "Branch: " + logFile.getName() + System.getProperty("line.separator");
-                    logs += KeyValueStore.getValueByKey(commitID) + System.getProperty("line.separator");
-                    commitID = bufferedReader.readLine();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            String logs = "";
+            ArrayList<String> commitsList = new ArrayList<>();
+            String commitId = KeyValueStore.readFileContent(Head.getWorkingBranchPath()).replaceAll("\r|\n", "");
+            do {
+                commitsList.add(commitId);
+                commitId = getParentCommit(commitId);
+            } while (!commitId.equals("null"));
+            for (String commit : commitsList) {
+                logs += KeyValueStore.getValueByKey(commit) + System.getProperty("line.separator");
             }
+            return logs;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return logs;
+        return null;
+    }
+
+    private static String getParentCommit(String commitID) {
+        String commitContent = KeyValueStore.getValueByKey(commitID);
+        return commitContent.substring(commitContent.indexOf("parent: ") + 8, commitContent.indexOf("\n", commitContent.indexOf("parent: "))).replaceAll("\r|\n", "");
     }
 
     // 回退到指定的commit，恢复该commit中的文件夹内容，并更新branch指针
