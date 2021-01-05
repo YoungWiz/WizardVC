@@ -3,8 +3,7 @@ package objects;
 import utils.Hash;
 import utils.KeyValueStore;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.security.MessageDigest;
 
 public class Blob extends KVObject {
@@ -47,7 +46,17 @@ public class Blob extends KVObject {
     public void store() {
         try {
             String objectFilePath = KeyValueStore.createObjectFile(this.getKey());
-            KeyValueStore.writeToFile(KeyValueStore.readFileContent(this.filepath), objectFilePath, true);
+            BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(filepath));
+            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(objectFilePath));
+            byte[] bytes = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(bytes)) > 0) {
+                outputStream.write(bytes, 0, bytesRead);
+            }
+            outputStream.flush();
+            inputStream.close();
+            outputStream.close();
+//            KeyValueStore.writeToFile(KeyValueStore.readFileContent(this.filepath), objectFilePath, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

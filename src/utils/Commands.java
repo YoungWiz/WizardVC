@@ -6,10 +6,7 @@ import objects.Commit;
 import refs.Branch;
 import refs.Head;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class Commands {
     // 用于关联add过程中已添加的object的tree对象，对应工作区的根目录
@@ -244,7 +241,17 @@ public class Commands {
                 if (objectType.equals("blob")) {
                     String restoreFilePath = path + File.separator + filename;
                     KeyValueStore.createFile(restoreFilePath);
-                    KeyValueStore.writeToFile(KeyValueStore.getValueByKey(key), restoreFilePath, true);
+                    BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(KeyValueStore.getStoragePath(key)));
+                    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(restoreFilePath));
+                    byte[] bytes = new byte[8192];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(bytes)) > 0) {
+                        outputStream.write(bytes, 0, bytesRead);
+                    }
+                    outputStream.flush();
+                    inputStream.close();
+                    outputStream.close();
+//                    KeyValueStore.writeToFile(KeyValueStore.getValueByKey(key), restoreFilePath, true);
                 }
                 if (objectType.equals("tree")) {
                     String restoreFilePath = path + File.separator + filename;
