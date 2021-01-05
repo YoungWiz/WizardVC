@@ -211,8 +211,57 @@ public class Commands {
         return logs;
     }
 
-    // 回退到指定的commit
+    // 回退到指定的commit，恢复该commit中的文件夹内容，并更新branch指针
     public static void reset(String commitID) {
+        String commitContent = KeyValueStore.returnValueByKey(commitID);
+        if (commitContent == null) {
+            System.out.println("failure: Unknown revision to WizardVC. Use 'wvc log' to view commit history.");
+            return;
+        }
+        String treeID = commitContent.substring(5, commitContent.indexOf("\t"));
+        rollBack(new File(KeyValueStore.getStoragePath(treeID)), KeyValueStore.getWorkingDirectory());
 
+        // 更新branch指针
+        try {
+            Branch branch = new Branch(Head.getWorkingBranch());
+            branch.setPointTo(commitID);
+            branch.update();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    public static void rollBack(File treeStoragefile, String path) {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(treeStoragefile));
+            String record = bufferedReader.readLine();
+            while (record != null) {
+                String objectType = record.substring(0, 4);
+                String key = record.substring(5, record.indexOf("\t"));
+                String filename = record.substring(record.indexOf("\t") + 1);
+
+                if (objectType.equals("blob")) {
+                    String restoreFilePath = path + File.separator + filename;
+                    KeyValueStore.createFile(restoreFilePath);
+                    KeyValueStore.writeToFile(KeyValueStore.returnValueByKey(key), restoreFilePath, true);
+                }
+                if (objectType.equals("tree")) {
+                    String restoreFilePath = path + File.separator + filename;
+                    KeyValueStore.makeDirs(restoreFilePath);
+                    rollBack(new File(KeyValueStore.getStoragePath(key)), restoreFilePath);
+                }
+                record = bufferedReader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    public static void deleteDir(File file) {
+//        if (file.isDirectory()) {
+//            for (File f : file.listFiles())
+//                deleteDir(f);
+//        }
+//        file.delete();
+//    }
 }

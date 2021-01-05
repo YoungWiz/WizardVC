@@ -58,6 +58,8 @@ public class Tree extends KVObject {
                 fileArrayList.add(new File(blob.getFilepath()));
             }
         }
+
+        fileArrayList.add(new File(filepath));
         File[] objectsFiles = fileArrayList.toArray(new File[fileArrayList.size()]);
         key = Hash.arrayHash(objectsFiles);
     }
@@ -89,14 +91,13 @@ public class Tree extends KVObject {
             objectFilePath = KeyValueStore.createObjectFile(this.getKey());
             // 在存储文件中写入tree包含的objects的信息
             BufferedWriter out = new BufferedWriter(new FileWriter(objectFilePath));
-            out.write(this.toString() + System.getProperty("line.separator"));
             for (KVObject i : objects) {
                 out.write(i.toString() + System.getProperty("line.separator"));
+                out.flush();
                 if (i.isTree()) {
                     i.store();
                 }
             }
-            out.flush();
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,12 +111,12 @@ public class Tree extends KVObject {
         for (File i : files) {
             if (i.isDirectory()) {
                 Tree tree = new Tree(i);
-                this.objects.add(tree);
+                this.addObject(tree);
                 tree.convert();
             }
             if (i.isFile()) {
                 Blob blob = new Blob(i);
-                this.objects.add(blob);
+                this.addObject(blob);
                 blob.store();
             }
         }
