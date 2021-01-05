@@ -15,24 +15,30 @@ public class Commands {
     private Commands() {
     }
 
-    public static void setRootTree(String rootPath) {
+    private static void setRootTree(String rootPath) {
         rootTree = new Tree(rootPath);
     }
 
     // 根据绝对路径设置工作区目录的方法
     public static void setWorkingDirectory(String absolutePath) {
-        KeyValueStore.setWorkingDirectory(absolutePath);
+        File file = new File(absolutePath);
+        if (file.exists() && file.isDirectory()) {
+            KeyValueStore.setWorkingDirectory(absolutePath);
+        } else {
+            System.out.println("Path not found.");
+            return;
+        }
     }
 
     public static void initialize() {
         if (KeyValueStore.getWorkingDirectory() == null) {
-            System.out.println("failure: Working directory has not been set. Use \"wvc set\" to set working directory.");
+            System.out.println("failure: Working directory has not been set. Use 'wvc set' to set working directory.");
             return;
         }
         // 判断当前工作区是否已经初始化
         File file = new File(KeyValueStore.getWorkingDirectory() + File.separator + "wvc");
         if (file.exists()) {
-            System.out.println("Reinitialized existing Wvc repository in " + KeyValueStore.getWorkingDirectory() + KeyValueStore.getWvcRootPath());
+            System.out.println("Reinitialized existing wvc repository in " + KeyValueStore.getWorkingDirectory() + KeyValueStore.getWvcRootPath());
             return;
         }
 
@@ -44,6 +50,7 @@ public class Commands {
         // 创建HEAD文件
         try {
             KeyValueStore.createFile(Head.getHeadPath());
+            System.out.println("Initialized empty wvc repository in " + KeyValueStore.getWorkingDirectory() + KeyValueStore.getWvcRootPath());
 //            Head.update();
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,6 +85,9 @@ public class Commands {
     }
 
     public static void commit(String message) {
+        if (!rootTree.containsObjects()) {
+            System.out.println("No changes added to commit. Use 'wvc add' to add files.");
+        }
         Commit newCommit = new Commit(rootTree);
         newCommit.setMessage(message);
         // 当前提交为初次提交的处理
@@ -187,18 +197,19 @@ public class Commands {
 
     // 返回log
     public static String getLogs() {
-        File[] files = new File(KeyValueStore.getLogsPath()).listFiles();
-        if (files == null) {
+
+        if (KeyValueStore.getWorkingDirectory() == null || KeyValueStore.getLogsPath() == null) {
             return null;
         }
 
+        File[] files = new File(KeyValueStore.getLogsPath()).listFiles();
         String logs = "";
-        for (File file : files) {
+        for (File logFile : files) {
             try {
-                BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(logFile));
                 String commitID = bufferedReader.readLine();
                 while (commitID != null) {
-                    logs += "Branch: " + file.getName() + System.getProperty("line.separator");
+                    logs += "Branch: " + logFile.getName() + System.getProperty("line.separator");
                     logs += KeyValueStore.getValueByKey(commitID) + System.getProperty("line.separator");
                     commitID = bufferedReader.readLine();
                 }
