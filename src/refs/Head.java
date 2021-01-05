@@ -25,13 +25,12 @@ public class Head {
         return workingBranch;
     }
 
+    public static String getWorkingBranchPath() {
+        return workingBranchPath;
+    }
+
     public static void setWorkingBranch(Branch branch) {
         workingBranch = branch.getBranchName();
-        setWorkingBranchPath(branch.getRefsPath() + workingBranch);
+        workingBranchPath = branch.getRefsPath();
     }
-
-    public static void setWorkingBranchPath(String workingBranchPath){
-
-    }
-
 }
