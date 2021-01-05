@@ -101,7 +101,7 @@ public class Commands {
             try {
                 Branch workingBranch = new Branch(Head.getWorkingBranch());
                 String parentCommitID = workingBranch.getAssociatedCommitID();
-                String parentCommitContent = KeyValueStore.returnValueByKey(parentCommitID);
+                String parentCommitContent = KeyValueStore.getValueByKey(parentCommitID);
                 int beginIndex = parentCommitContent.indexOf("tree") + 5;
                 int endIndex = parentCommitContent.indexOf("\t", beginIndex);
                 String parentTreeID = parentCommitContent.substring(beginIndex, endIndex);
@@ -142,8 +142,9 @@ public class Commands {
 
     // 更改当前工作的分支
     public static void switchBranches(String branchName) {
-        if (!rootTree.containsObjects()) {
+        if (rootTree.containsObjects()) {
             System.out.println("You have uncommitted changes, Please commit them before you switch branches");
+            return;
         }
         File file = new File(KeyValueStore.getRefsPath() + branchName);
         if (!file.exists()) {
@@ -201,7 +202,7 @@ public class Commands {
                 String commitID = bufferedReader.readLine();
                 while (commitID != null) {
                     logs += "Branch: " + file.getName() + System.getProperty("line.separator");
-                    logs += KeyValueStore.returnValueByKey(commitID) + System.getProperty("line.separator");
+                    logs += KeyValueStore.getValueByKey(commitID) + System.getProperty("line.separator");
                     commitID = bufferedReader.readLine();
                 }
             } catch (IOException e) {
@@ -213,7 +214,7 @@ public class Commands {
 
     // 回退到指定的commit，恢复该commit中的文件夹内容，并更新branch指针
     public static void reset(String commitID) {
-        String commitContent = KeyValueStore.returnValueByKey(commitID);
+        String commitContent = KeyValueStore.getValueByKey(commitID);
         if (commitContent == null) {
             System.out.println("failure: Unknown revision to WizardVC. Use 'wvc log' to view commit history.");
             return;
@@ -243,7 +244,7 @@ public class Commands {
                 if (objectType.equals("blob")) {
                     String restoreFilePath = path + File.separator + filename;
                     KeyValueStore.createFile(restoreFilePath);
-                    KeyValueStore.writeToFile(KeyValueStore.returnValueByKey(key), restoreFilePath, true);
+                    KeyValueStore.writeToFile(KeyValueStore.getValueByKey(key), restoreFilePath, true);
                 }
                 if (objectType.equals("tree")) {
                     String restoreFilePath = path + File.separator + filename;

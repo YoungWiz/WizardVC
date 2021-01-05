@@ -70,7 +70,7 @@ public class KeyValueStore {
     }
 
     // 根据文件的hash值(key)返回文件内容
-    public static String returnValueByKey(String key) {
+    public static String getValueByKey(String key) {
         String filepath = getStoragePath(key);
         String value = null;
 
