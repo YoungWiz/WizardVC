@@ -53,7 +53,7 @@ public class KeyValueStore {
         return filepath;
     }
 
-    // 向文件中写入内容，并根据要求选择是否覆写
+    // 向文件中写入内容，并根据要求选择是否覆写，若文件不存在则创建文件。
     public static void writeToFile(String content, String filepath, boolean overRide) throws IOException {
         if (overRide == true) {
             BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
@@ -69,29 +69,9 @@ public class KeyValueStore {
         }
     }
 
-    // 给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
-//    public static String kvStore(String value) {
-//        String hashcode = null;
-//
-//        try {
-//            // 以git的存储结构保存object
-//            hashcode = Hash.stringHash(value);
-//            String filepath = createObjectFile(hashcode);
-//
-//            // 写入文件内容
-//            BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
-//            out.write(value);
-//            out.flush();
-//            out.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return hashcode;
-//    }
-
     // 根据文件的hash值(key)返回文件内容
-    public static String returnValueByKey(String key) {
-        String filepath = objectsPath + key.substring(0, 2) + File.separator + key.substring(2);
+    public static String getValueByKey(String key) {
+        String filepath = getStoragePath(key);
         String value = null;
 
         try {
@@ -140,11 +120,35 @@ public class KeyValueStore {
         return workingDirectory;
     }
 
+    public static String getStoragePath(String hashcode) {
+        return objectsPath + hashcode.substring(0, 2) + File.separator + hashcode.substring(2);
+    }
+
     public static void setWorkingDirectory(String wd) {
         workingDirectory = wd;
         objectsPath = workingDirectory + wvcRootPath + "objects" + File.separator;
         refsPath = workingDirectory + wvcRootPath + "refs" + File.separator;
         logsPath = workingDirectory + wvcRootPath + "logs" + File.separator;
     }
+
+    // 给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
+//    public static String kvStore(String value) {
+//        String hashcode = null;
+//
+//        try {
+//            // 以git的存储结构保存object
+//            hashcode = Hash.stringHash(value);
+//            String filepath = createObjectFile(hashcode);
+//
+//            // 写入文件内容
+//            BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
+//            out.write(value);
+//            out.flush();
+//            out.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return hashcode;
+//    }
 }
 

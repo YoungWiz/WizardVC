@@ -6,10 +6,7 @@ import objects.Commit;
 import refs.Branch;
 import refs.Head;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class Commands {
     // 用于关联add过程中已添加的object的tree对象，对应工作区的根目录
@@ -101,7 +98,7 @@ public class Commands {
             try {
                 Branch workingBranch = new Branch(Head.getWorkingBranch());
                 String parentCommitID = workingBranch.getAssociatedCommitID();
-                String parentCommitContent = KeyValueStore.returnValueByKey(parentCommitID);
+                String parentCommitContent = KeyValueStore.getValueByKey(parentCommitID);
                 int beginIndex = parentCommitContent.indexOf("tree") + 5;
                 int endIndex = parentCommitContent.indexOf("\t", beginIndex);
                 String parentTreeID = parentCommitContent.substring(beginIndex, endIndex);
@@ -142,8 +139,9 @@ public class Commands {
 
     // 更改当前工作的分支
     public static void switchBranches(String branchName) {
-        if (!rootTree.containsObjects()) {
+        if (rootTree.containsObjects()) {
             System.out.println("You have uncommitted changes, Please commit them before you switch branches");
+            return;
         }
         File file = new File(KeyValueStore.getRefsPath() + branchName);
         if (!file.exists()) {
@@ -201,7 +199,7 @@ public class Commands {
                 String commitID = bufferedReader.readLine();
                 while (commitID != null) {
                     logs += "Branch: " + file.getName() + System.getProperty("line.separator");
-                    logs += KeyValueStore.returnValueByKey(commitID) + System.getProperty("line.separator");
+                    logs += KeyValueStore.getValueByKey(commitID) + System.getProperty("line.separator");
                     commitID = bufferedReader.readLine();
                 }
             } catch (IOException e) {
@@ -211,8 +209,67 @@ public class Commands {
         return logs;
     }
 
-    // 回退到指定的commit
+    // 回退到指定的commit，恢复该commit中的文件夹内容，并更新branch指针
     public static void reset(String commitID) {
+        String commitContent = KeyValueStore.getValueByKey(commitID);
+        if (commitContent == null) {
+            System.out.println("failure: Unknown revision to WizardVC. Use 'wvc log' to view commit history.");
+            return;
+        }
+        String treeID = commitContent.substring(5, commitContent.indexOf("\t"));
+        rollBack(new File(KeyValueStore.getStoragePath(treeID)), KeyValueStore.getWorkingDirectory());
 
+        // 更新branch指针
+        try {
+            Branch branch = new Branch(Head.getWorkingBranch());
+            branch.setPointTo(commitID);
+            branch.update();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    public static void rollBack(File treeStoragefile, String path) {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(treeStoragefile));
+            String record = bufferedReader.readLine();
+            while (record != null) {
+                String objectType = record.substring(0, 4);
+                String key = record.substring(5, record.indexOf("\t"));
+                String filename = record.substring(record.indexOf("\t") + 1);
+
+                if (objectType.equals("blob")) {
+                    String restoreFilePath = path + File.separator + filename;
+                    KeyValueStore.createFile(restoreFilePath);
+                    BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(KeyValueStore.getStoragePath(key)));
+                    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(restoreFilePath));
+                    byte[] bytes = new byte[8192];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(bytes)) > 0) {
+                        outputStream.write(bytes, 0, bytesRead);
+                    }
+                    outputStream.flush();
+                    inputStream.close();
+                    outputStream.close();
+//                    KeyValueStore.writeToFile(KeyValueStore.getValueByKey(key), restoreFilePath, true);
+                }
+                if (objectType.equals("tree")) {
+                    String restoreFilePath = path + File.separator + filename;
+                    KeyValueStore.makeDirs(restoreFilePath);
+                    rollBack(new File(KeyValueStore.getStoragePath(key)), restoreFilePath);
+                }
+                record = bufferedReader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    public static void deleteDir(File file) {
+//        if (file.isDirectory()) {
+//            for (File f : file.listFiles())
+//                deleteDir(f);
+//        }
+//        file.delete();
+//    }
 }
