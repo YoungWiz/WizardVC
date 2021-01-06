@@ -163,6 +163,7 @@ public class Commands {
         }
         try {
             Head.setWorkingBranch(new Branch(branchName));
+            System.out.println("Switched to branch " + branchName);
         } catch (IOException e) {
             e.printStackTrace();
         }
