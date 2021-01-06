@@ -54,7 +54,7 @@ public class Hash {
     }
 
     // 给定一个存有File对象的数组，递归地计算数据中对象的hashcode并返回
-    public static String arrayHash(File[] files) {
+    public static String fileArrayHash(File[] files) {
         MessageDigest messageDigest;
         String hashcode = null;
         try {

@@ -98,7 +98,7 @@ public class Commands {
         if (Head.getWorkingBranch() == null) {
             try {
                 Branch mainBranch = new Branch("main");
-                mainBranch.setPointTo(newCommit.getKey());
+                mainBranch.pointTo(newCommit.getKey());
                 Head.setWorkingBranch(mainBranch);
                 mainBranch.store();
                 newCommit.store();
@@ -124,7 +124,7 @@ public class Commands {
                 }
                 newCommit.setParent(parentCommitID);
                 newCommit.store();
-                workingBranch.setPointTo(newCommit.getKey());
+                workingBranch.pointTo(newCommit.getKey());
                 workingBranch.update();
 
                 rootTree.store();
@@ -143,7 +143,7 @@ public class Commands {
         try {
             Branch newBranch = new Branch(branchName);
             Branch currentBranch = new Branch(Head.getWorkingBranch());
-            newBranch.setPointTo(currentBranch.getAssociatedCommitID());
+            newBranch.pointTo(currentBranch.getAssociatedCommitID());
             newBranch.store();
         } catch (IOException e) {
             e.printStackTrace();
@@ -273,16 +273,16 @@ public class Commands {
         // 更新branch指针
         try {
             Branch branch = new Branch(Head.getWorkingBranch());
-            branch.setPointTo(commitID);
+            branch.pointTo(commitID);
             branch.update();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void rollBack(File treeStoragefile, String path) {
+    public static void rollBack(File treeStorageFile, String path) {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(treeStoragefile));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(treeStorageFile));
             String record = bufferedReader.readLine();
             while (record != null) {
                 String objectType = record.substring(0, 4);

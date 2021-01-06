@@ -61,7 +61,7 @@ public class Tree extends KVObject {
 
         fileArrayList.add(new File(filepath));
         File[] objectsFiles = fileArrayList.toArray(new File[fileArrayList.size()]);
-        key = Hash.arrayHash(objectsFiles);
+        key = Hash.fileArrayHash(objectsFiles);
     }
 
     public void addObject(KVObject object) {

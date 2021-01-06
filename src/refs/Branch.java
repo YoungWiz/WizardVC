@@ -41,7 +41,7 @@ public class Branch {
         return branchName;
     }
 
-    public void setPointTo(String commitID) {
+    public void pointTo(String commitID) {
         associatedCommitID = commitID;
     }
 
