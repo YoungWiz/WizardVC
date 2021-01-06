@@ -170,6 +170,9 @@ public class Commands {
 
     // 返回当前已有的branch
     public static String listBranches() {
+        if (KeyValueStore.getWorkingDirectory() == null || Head.getWorkingBranch() == null) {
+            return "failure: No branches to list.";
+        }
         String listOfBranches = "";
         File[] files = new File(KeyValueStore.getRefsPath()).listFiles();
         if (files == null) {
@@ -184,6 +187,9 @@ public class Commands {
 
     // 返回工作区中的文件/文件夹
     public static String listFiles() {
+        if (KeyValueStore.getWorkingDirectory() == null) {
+            return "failure: Working directory is not set.";
+        }
         String listOfFiles = "";
         if (KeyValueStore.getWorkingDirectory() == null) {
             System.out.println("failure: Working directory has not been set.");
