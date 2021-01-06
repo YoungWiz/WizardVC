@@ -42,8 +42,8 @@ public class Commands {
         // 判断当前工作区是否已经初始化
         File file = new File(KeyValueStore.getWorkingDirectory() + File.separator + "wvc");
         if (file.exists()) {
+            deleteDir(file);
             System.out.println("Reinitialized existing wvc repository in " + KeyValueStore.getWorkingDirectory() + KeyValueStore.getWvcRootPath());
-            return;
         }
 
         setRootTree(KeyValueStore.getWorkingDirectory());
@@ -316,11 +316,11 @@ public class Commands {
         }
     }
 
-//    public static void deleteDir(File file) {
-//        if (file.isDirectory()) {
-//            for (File f : file.listFiles())
-//                deleteDir(f);
-//        }
-//        file.delete();
-//    }
+    public static void deleteDir(File file) {
+        if (file.isDirectory()) {
+            for (File f : file.listFiles())
+                deleteDir(f);
+        }
+        file.delete();
+    }
 }
