@@ -84,6 +84,10 @@ public class Tree extends KVObject {
         return filepath;
     }
 
+    public ArrayList<KVObject> getObjects() {
+        return objects;
+    }
+
     @Override
     public void store() {
         String objectFilePath;
