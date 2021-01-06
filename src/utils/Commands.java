@@ -100,7 +100,6 @@ public class Commands {
                 Branch mainBranch = new Branch("main");
                 mainBranch.setPointTo(newCommit.getKey());
                 Head.setWorkingBranch(mainBranch);
-                Head.update();
                 mainBranch.store();
                 newCommit.store();
                 rootTree.store();

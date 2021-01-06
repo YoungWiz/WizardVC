@@ -32,5 +32,6 @@ public class Head {
     public static void setWorkingBranch(Branch branch) {
         workingBranch = branch.getBranchName();
         workingBranchPath = branch.getRefsPath();
+        update();
     }
 }
