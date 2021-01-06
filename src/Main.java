@@ -11,6 +11,9 @@ public class Main {
                 Commands.setWorkingDirectory(instruction.substring(12));
                 continue;
             }
+            if (instruction.startsWith("wvc username ")) {
+                Commands.setAuthor(instruction.substring(13));
+            }
             if (instruction.equals("wvc init")) {
                 Commands.initialize();
                 continue;
@@ -43,6 +46,11 @@ public class Main {
                 System.out.println(Commands.getLogs());
                 continue;
             }
+
+            if (instruction.equals("wvc reflog")) {
+                System.out.println(Commands.getRefLogs());
+            }
+
             if (instruction.startsWith("wvc reset ")) {
                 Commands.reset(instruction.substring(10));
                 continue;

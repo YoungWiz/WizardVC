@@ -30,6 +30,10 @@ public class Commands {
         }
     }
 
+    public static void setAuthor(String authorName) {
+        Commit.setAuthorInfo(authorName);
+    }
+
     public static void initialize() {
         if (KeyValueStore.getWorkingDirectory() == null) {
             System.out.println("failure: Working directory has not been set. Use 'wvc set' to set working directory.");
@@ -223,6 +227,31 @@ public class Commands {
     private static String getParentCommit(String commitID) {
         String commitContent = KeyValueStore.getValueByKey(commitID);
         return commitContent.substring(commitContent.indexOf("parent: ") + 8, commitContent.indexOf("\n", commitContent.indexOf("parent: "))).replaceAll("\r|\n", "");
+    }
+
+    // 返回所有分支的历史提交
+    public static String getRefLogs() {
+
+        if (KeyValueStore.getWorkingDirectory() == null || KeyValueStore.getLogsPath() == null) {
+            return null;
+        }
+
+        File[] files = new File(KeyValueStore.getLogsPath()).listFiles();
+        String refLogs = "";
+        for (File logFile : files) {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(logFile));
+                String commitID = bufferedReader.readLine();
+                while (commitID != null) {
+                    refLogs += "Branch: " + logFile.getName() + System.getProperty("line.separator");
+                    refLogs += KeyValueStore.getValueByKey(commitID) + System.getProperty("line.separator");
+                    commitID = bufferedReader.readLine();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return refLogs;
     }
 
     // 回退到指定的commit，恢复该commit中的文件夹内容，并更新branch指针
