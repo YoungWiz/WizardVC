@@ -71,10 +71,12 @@ public class Commands {
             System.out.println("failure: '" + filePath + "' did not match any files.");
             return;
         }
-//        // 判断是否重复添加
-//        for (KVObject object : rootTree.getObjects()) {
-//            if (file.getAbsolutePath().equals(object))
-//        }
+        // 判断是否重复添加文件/文件夹
+        for (KVObject object : rootTree.getObjects()) {
+            if (file.getAbsolutePath().equals(object.getFilePath())) {
+                System.out.println("failure: '" + filePath + "' has already been added.");
+            }
+        }
         // 若add的对象为文件，则直接转化为blob存储
         if (file.isFile()) {
             Blob blob = new Blob(file);
@@ -91,7 +93,7 @@ public class Commands {
                 e.printStackTrace();
             }
         }
-        System.out.println(relativePath +  " is added ");
+        System.out.println(relativePath +  " is added.");
     }
 
     public static void commit(String message) {
