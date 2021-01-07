@@ -1,9 +1,7 @@
 package objects;
 
 public abstract class KVObject {
-    protected String objectType;
-    protected String key;
-    protected String filename;
+    protected String objectType, key, filePath, filename;
 
     public boolean isBlob() {
         return objectType == "blob";
@@ -20,6 +18,8 @@ public abstract class KVObject {
     public String getFileName() {
         return filename;
     }
+
+    public String getFilePath() {return filePath;}
 
     public void store() {
     }

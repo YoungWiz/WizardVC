@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Branch {
-    private  String branchName, refsPath, logsPath, associatedCommitID;
+    private String branchName, refsPath, logsPath, associatedCommitID;
 
     public Branch(String branchName) throws IOException {
         this.branchName = branchName;
@@ -21,7 +21,7 @@ public class Branch {
             KeyValueStore.createFile(this.getRefsPath());
             KeyValueStore.createFile(this.getLogsPath());
         } else {
-            associatedCommitID = KeyValueStore.readFileContent(refsPath).replace("\r\n", "");
+            associatedCommitID = KeyValueStore.readFileContent(refsPath).replaceAll("\r|\n", "");
         }
     }
 
@@ -41,7 +41,7 @@ public class Branch {
         return branchName;
     }
 
-    public void setPointTo(String commitID) {
+    public void pointTo(String commitID) {
         associatedCommitID = commitID;
     }
 

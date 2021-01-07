@@ -1,6 +1,7 @@
 package utils;
 
 import objects.Blob;
+import objects.KVObject;
 import objects.Tree;
 import objects.Commit;
 import refs.Branch;
@@ -42,8 +43,8 @@ public class Commands {
         // 判断当前工作区是否已经初始化
         File file = new File(KeyValueStore.getWorkingDirectory() + File.separator + "wvc");
         if (file.exists()) {
+            deleteDir(file);
             System.out.println("Reinitialized existing wvc repository in " + KeyValueStore.getWorkingDirectory() + KeyValueStore.getWvcRootPath());
-            return;
         }
 
         setRootTree(KeyValueStore.getWorkingDirectory());
@@ -70,6 +71,12 @@ public class Commands {
             System.out.println("failure: '" + filePath + "' did not match any files.");
             return;
         }
+        // 判断是否重复添加文件/文件夹
+        for (KVObject object : rootTree.getObjects()) {
+            if (file.getAbsolutePath().equals(object.getFilePath())) {
+                System.out.println("failure: '" + filePath + "' has already been added.");
+            }
+        }
         // 若add的对象为文件，则直接转化为blob存储
         if (file.isFile()) {
             Blob blob = new Blob(file);
@@ -86,6 +93,7 @@ public class Commands {
                 e.printStackTrace();
             }
         }
+        System.out.println(relativePath +  " is added.");
     }
 
     public static void commit(String message) {
@@ -98,9 +106,8 @@ public class Commands {
         if (Head.getWorkingBranch() == null) {
             try {
                 Branch mainBranch = new Branch("main");
-                mainBranch.setPointTo(newCommit.getKey());
+                mainBranch.pointTo(newCommit.getKey());
                 Head.setWorkingBranch(mainBranch);
-                Head.update();
                 mainBranch.store();
                 newCommit.store();
                 rootTree.store();
@@ -125,7 +132,7 @@ public class Commands {
                 }
                 newCommit.setParent(parentCommitID);
                 newCommit.store();
-                workingBranch.setPointTo(newCommit.getKey());
+                workingBranch.pointTo(newCommit.getKey());
                 workingBranch.update();
 
                 rootTree.store();
@@ -144,7 +151,7 @@ public class Commands {
         try {
             Branch newBranch = new Branch(branchName);
             Branch currentBranch = new Branch(Head.getWorkingBranch());
-            newBranch.setPointTo(currentBranch.getAssociatedCommitID());
+            newBranch.pointTo(currentBranch.getAssociatedCommitID());
             newBranch.store();
         } catch (IOException e) {
             e.printStackTrace();
@@ -164,6 +171,7 @@ public class Commands {
         }
         try {
             Head.setWorkingBranch(new Branch(branchName));
+            System.out.println("Switched to branch " + branchName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -171,6 +179,9 @@ public class Commands {
 
     // 返回当前已有的branch
     public static String listBranches() {
+        if (KeyValueStore.getWorkingDirectory() == null || Head.getWorkingBranch() == null) {
+            return "failure: No branches to list.";
+        }
         String listOfBranches = "";
         File[] files = new File(KeyValueStore.getRefsPath()).listFiles();
         if (files == null) {
@@ -185,6 +196,9 @@ public class Commands {
 
     // 返回工作区中的文件/文件夹
     public static String listFiles() {
+        if (KeyValueStore.getWorkingDirectory() == null) {
+            return "failure: Working directory is not set.";
+        }
         String listOfFiles = "";
         if (KeyValueStore.getWorkingDirectory() == null) {
             System.out.println("failure: Working directory has not been set.");
@@ -267,16 +281,16 @@ public class Commands {
         // 更新branch指针
         try {
             Branch branch = new Branch(Head.getWorkingBranch());
-            branch.setPointTo(commitID);
+            branch.pointTo(commitID);
             branch.update();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void rollBack(File treeStoragefile, String path) {
+    public static void rollBack(File treeStorageFile, String path) {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(treeStoragefile));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(treeStorageFile));
             String record = bufferedReader.readLine();
             while (record != null) {
                 String objectType = record.substring(0, 4);
@@ -310,11 +324,11 @@ public class Commands {
         }
     }
 
-//    public static void deleteDir(File file) {
-//        if (file.isDirectory()) {
-//            for (File f : file.listFiles())
-//                deleteDir(f);
-//        }
-//        file.delete();
-//    }
+    public static void deleteDir(File file) {
+        if (file.isDirectory()) {
+            for (File f : file.listFiles())
+                deleteDir(f);
+        }
+        file.delete();
+    }
 }

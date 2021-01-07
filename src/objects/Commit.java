@@ -58,7 +58,7 @@ public class Commit extends KVObject {
 
     @Override
     public String toString() {
-        return "commit ID: " + key + System.getProperty("line.separator") + "parent: " + parent + System.getProperty("line.separator") + authorInfo + System.getProperty("line.separator") + date.toString() + System.getProperty("line.separator") + message;
+        return "commit ID: " + key + System.getProperty("line.separator") + "parent: " + parent + System.getProperty("line.separator") +"author: " + authorInfo + System.getProperty("line.separator") + date.toString() + System.getProperty("line.separator") + message;
     }
 
     @Override

@@ -54,8 +54,8 @@ public class KeyValueStore {
     }
 
     // 向文件中写入内容，并根据要求选择是否覆写，若文件不存在则创建文件。
-    public static void writeToFile(String content, String filepath, boolean overRide) throws IOException {
-        if (overRide == true) {
+    public static void writeToFile(String content, String filepath, boolean overWrite) throws IOException {
+        if (overWrite == true) {
             BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
             out.write(content);
             out.flush();

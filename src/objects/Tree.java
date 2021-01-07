@@ -18,27 +18,26 @@ public class Tree extends KVObject {
 
     // 存放tree对象包含的objects的arraylist
     private final ArrayList<KVObject> objects = new ArrayList<>();
-    private String filepath;
 
     // 根据路径创建tree对象
     public Tree(String path) {
         objectType = "tree";
-        filepath = path;
-        filename = filepath.substring(filepath.lastIndexOf(File.separator));
+        filePath = path;
+        filename = filePath.substring(filePath.lastIndexOf(File.separator));
 
     }
 
     // 根据File对象创建tree对象,并在tree对象的objects数组中存入file对应的目录下的所有文件/文件夹
     public Tree(File file) {
         objectType = "tree";
-        filepath = file.getAbsolutePath();
+        filePath = file.getAbsolutePath();
         filename = file.getName();
 
         // 计算tree对象的hash值
         MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-1");
-            Hash.dirHash(new File(filepath), md);
+            Hash.dirHash(new File(filePath), md);
             key = Hash.digest(md);
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,17 +50,17 @@ public class Tree extends KVObject {
         for (KVObject object : objects) {
             if (object.isTree()) {
                 Tree tree = (Tree) object;
-                fileArrayList.add(new File(tree.getFilepath()));
+                fileArrayList.add(new File(tree.getFilePath()));
             }
             if (object.isBlob()) {
                 Blob blob = (Blob) object;
-                fileArrayList.add(new File(blob.getFilepath()));
+                fileArrayList.add(new File(blob.getFilePath()));
             }
         }
 
-        fileArrayList.add(new File(filepath));
+        fileArrayList.add(new File(filePath));
         File[] objectsFiles = fileArrayList.toArray(new File[fileArrayList.size()]);
-        key = Hash.arrayHash(objectsFiles);
+        key = Hash.fileArrayHash(objectsFiles);
     }
 
     public void addObject(KVObject object) {
@@ -80,8 +79,13 @@ public class Tree extends KVObject {
         return true;
     }
 
-    public String getFilepath() {
-        return filepath;
+    @Override
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public ArrayList<KVObject> getObjects() {
+        return objects;
     }
 
     @Override
@@ -106,7 +110,7 @@ public class Tree extends KVObject {
 
     // 给定文件目录，将目录下的文件转化为tree和blob,并将blob保存
     public void convert() throws IOException {
-        File dir = new File(filepath);
+        File dir = new File(filePath);
         File[] files = dir.listFiles();
         for (File i : files) {
             if (i.isDirectory()) {

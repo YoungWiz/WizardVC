@@ -1,4 +1,6 @@
+import refs.Head;
 import utils.Commands;
+import utils.KeyValueStore;
 
 import java.util.Scanner;
 
@@ -6,13 +8,27 @@ public class Main {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         String instruction;
+
         while (!(instruction = input.nextLine()).equals("wvc exit")) {
-            if (instruction.startsWith("wvc set cwd ")) {
-                Commands.setWorkingDirectory(instruction.substring(12));
+
+            if (instruction.startsWith("wvc cwd ")) {
+                Commands.setWorkingDirectory(instruction.substring(8));
                 continue;
             }
+
+            if (KeyValueStore.getWorkingDirectory() != null) {
+                if (Head.getWorkingBranch() == null) {
+                    System.out.println(KeyValueStore.getWorkingDirectory());
+                } else {
+                    System.out.println(KeyValueStore.getWorkingDirectory() + " (" + Head.getWorkingBranch() + ")");
+                }
+            } else {
+                System.out.println("Working directory is not set.");
+            }
+
             if (instruction.startsWith("wvc username ")) {
                 Commands.setAuthor(instruction.substring(13));
+                continue;
             }
             if (instruction.equals("wvc init")) {
                 Commands.initialize();
@@ -49,6 +65,7 @@ public class Main {
 
             if (instruction.equals("wvc reflog")) {
                 System.out.println(Commands.getRefLogs());
+                continue;
             }
 
             if (instruction.startsWith("wvc reset ")) {

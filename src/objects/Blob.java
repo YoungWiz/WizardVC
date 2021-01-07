@@ -8,25 +8,23 @@ import java.security.MessageDigest;
 
 public class Blob extends KVObject {
 
-    private final String filepath;
-
     // 根据文件路径创建blob的构造方法
     public Blob(String path) {
         objectType = "blob";
-        filepath = path;
+        filePath = path;
         try {
             key = Hash.stringHash(KeyValueStore.readFileContent(path));
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
-        filename = filepath.substring(filepath.lastIndexOf(File.separator));
+        filename = filePath.substring(filePath.lastIndexOf(File.separator));
     }
 
     // 根据File对象创建blob的方法
     public Blob(File file) {
         objectType = "blob";
-        filepath = file.getAbsolutePath();
+        filePath = file.getAbsolutePath();
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
             Hash.fileHash(file, md);
@@ -38,15 +36,15 @@ public class Blob extends KVObject {
         filename = file.getName();
     }
 
-    public String getFilepath() {
-        return filepath;
+    public String getFilePath() {
+        return filePath;
     }
 
     @Override
     public void store() {
         try {
             String objectFilePath = KeyValueStore.createObjectFile(this.getKey());
-            BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(filepath));
+            BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(filePath));
             BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(objectFilePath));
             byte[] bytes = new byte[8192];
             int bytesRead;
