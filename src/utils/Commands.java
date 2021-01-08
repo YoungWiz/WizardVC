@@ -97,8 +97,9 @@ public class Commands {
     }
 
     public static void commit(String message) {
-        if (KeyValueStore.getWorkingDirectory().equals(null) || !rootTree.containsObjects()) {
+        if (KeyValueStore.getWorkingDirectory() == null || !rootTree.containsObjects()) {
             System.out.println("No changes added to commit. Use 'wvc add' to add files.");
+            return;
         }
         Commit newCommit = new Commit(rootTree);
         newCommit.setMessage(message);
@@ -144,9 +145,16 @@ public class Commands {
     }
 
     public static void branch(String branchName) {
+        if (KeyValueStore.getWorkingDirectory() == null) {
+            System.out.println("failure: Working directory has not been set. Use 'wvc set' to set working directory.");
+            return;
+        } else if (Head.getWorkingBranch() == null) {
+            System.out.println("failure: Branch operations cannot be performed before any commit(s).");
+        }
         File file = new File(KeyValueStore.getRefsPath() + branchName);
         if (file.exists()) {
             System.out.println("failure: A branch named '" + branchName + "' already exists.");
+            return;
         }
         try {
             Branch newBranch = new Branch(branchName);
