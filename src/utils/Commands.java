@@ -57,7 +57,6 @@ public class Commands {
         try {
             KeyValueStore.createFile(Head.getHeadPath());
             System.out.println("Initialized empty wvc repository in " + KeyValueStore.getWorkingDirectory() + KeyValueStore.getWvcRootPath());
-//            Head.update();
         } catch (IOException e) {
             e.printStackTrace();
         }
