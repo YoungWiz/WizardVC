@@ -150,6 +150,7 @@ public class Commands {
             return;
         } else if (Head.getWorkingBranch() == null) {
             System.out.println("failure: Branch operations cannot be performed before any commit(s).");
+            return;
         }
         File file = new File(KeyValueStore.getRefsPath() + branchName);
         if (file.exists()) {
@@ -183,6 +184,29 @@ public class Commands {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void deleteBranch(String branchName) {
+        if (KeyValueStore.getWorkingDirectory() == null) {
+            System.out.println("failure: Working directory has not been set. Use 'wvc set' to set working directory.");
+            return;
+        } else if (Head.getWorkingBranch() == null) {
+            System.out.println("failure: Delete branch operations cannot be performed before any commit(s).");
+            return;
+        }
+        File refFile = new File(KeyValueStore.getRefsPath() + branchName);
+        File logFile = new File(KeyValueStore.getLogsPath() + branchName);
+        if (!refFile.exists() || !logFile.exists()) {
+            System.out.println("failure: Branch named '" + branchName + "' does not exist.");
+            return;
+        }
+        if (Head.getWorkingBranch().equals(branchName)) {
+            System.out.println("failure: Cannot delete the branch you are working on.");
+            return;
+        }
+        refFile.delete();
+        logFile.delete();
+        System.out.println("Branch " + branchName + " is deleted.");
     }
 
     // 返回当前已有的branch
