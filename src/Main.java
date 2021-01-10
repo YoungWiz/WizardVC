@@ -46,6 +46,10 @@ public class Main {
                 Commands.branch(instruction.substring(11));
                 continue;
             }
+            if (instruction.startsWith("wvc branch -d ")) {
+                Commands.deleteBranch(instruction.substring(14));
+                continue;
+            }
             if (instruction.startsWith("wvc switch ")) {
                 Commands.switchBranches(instruction.substring(11));
                 continue;
