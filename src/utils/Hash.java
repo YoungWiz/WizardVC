@@ -3,12 +3,7 @@ package utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-/*
- * 待完成的任务：
- * 1. 降低耦合
- * */
 public class Hash {
     private Hash() {
     }
@@ -58,7 +53,7 @@ public class Hash {
         MessageDigest messageDigest;
         String hashcode = null;
         try {
-            messageDigest= MessageDigest.getInstance("SHA-1");
+            messageDigest = MessageDigest.getInstance("SHA-1");
             for (File file : files) {
                 if (file.isFile()) {
                     fileHash(file, messageDigest);

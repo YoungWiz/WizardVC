@@ -15,10 +15,6 @@ public abstract class KVObject {
         return key;
     }
 
-    public String getFileName() {
-        return filename;
-    }
-
     public String getFilePath() {return filePath;}
 
     public void store() {

@@ -54,7 +54,6 @@ public class Blob extends KVObject {
             outputStream.flush();
             inputStream.close();
             outputStream.close();
-//            KeyValueStore.writeToFile(KeyValueStore.readFileContent(this.filepath), objectFilePath, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
