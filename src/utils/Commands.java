@@ -33,6 +33,7 @@ public class Commands {
 
     public static void setAuthor(String authorName) {
         Commit.setAuthorInfo(authorName);
+        System.out.println("Author has been set as " + authorName);
     }
 
     public static void initialize() {
@@ -56,7 +57,6 @@ public class Commands {
         try {
             KeyValueStore.createFile(Head.getHeadPath());
             System.out.println("Initialized empty wvc repository in " + KeyValueStore.getWorkingDirectory() + KeyValueStore.getWvcRootPath());
-//            Head.update();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,7 +93,7 @@ public class Commands {
                 e.printStackTrace();
             }
         }
-        System.out.println(relativePath +  " is added.");
+        System.out.println(relativePath + " is added.");
     }
 
     public static void commit(String message) {
@@ -216,9 +216,6 @@ public class Commands {
         }
         String listOfBranches = "";
         File[] files = new File(KeyValueStore.getRefsPath()).listFiles();
-        if (files == null) {
-            return null;
-        }
         for (File file : files) {
             listOfBranches += file.getName() + System.getProperty("line.separator");
         }
@@ -231,11 +228,8 @@ public class Commands {
         if (KeyValueStore.getWorkingDirectory() == null) {
             return "failure: Working directory is not set.";
         }
+
         String listOfFiles = "";
-        if (KeyValueStore.getWorkingDirectory() == null) {
-            System.out.println("failure: Working directory has not been set.");
-            return null;
-        }
         File[] files = new File(KeyValueStore.getWorkingDirectory()).listFiles();
         for (File file : files) {
             if (!file.getName().equals("wvc")) {
@@ -320,6 +314,7 @@ public class Commands {
         }
     }
 
+    // 将treeStorageFile中包含的文件回滚
     public static void rollBack(File treeStorageFile, String path) {
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(treeStorageFile));
@@ -342,7 +337,6 @@ public class Commands {
                     outputStream.flush();
                     inputStream.close();
                     outputStream.close();
-//                    KeyValueStore.writeToFile(KeyValueStore.getValueByKey(key), restoreFilePath, true);
                 }
                 if (objectType.equals("tree")) {
                     String restoreFilePath = path + File.separator + filename;
@@ -356,6 +350,7 @@ public class Commands {
         }
     }
 
+    // 删除目录及目录下的文件/文件夹
     public static void deleteDir(File file) {
         if (file.isDirectory()) {
             for (File f : file.listFiles())

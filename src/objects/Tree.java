@@ -10,10 +10,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 
-/*
- * 待完成的任务：
- * 1. 改进hashcode的计算方法，每次只对objects中的对象计算hash值
- * */
 public class Tree extends KVObject {
 
     // 存放tree对象包含的objects的arraylist

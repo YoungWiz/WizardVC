@@ -2,11 +2,6 @@ package utils;
 
 import java.io.*;
 
-/*
- * 待完成任务：
- * 1. 以二进制方式存取文件
- * 2. 优化文件读取，减少内存占用
- * */
 public class KeyValueStore {
 
     private static final String wvcRootPath = File.separator + "wvc" + File.separator;
@@ -118,10 +113,6 @@ public class KeyValueStore {
         return workingDirectory;
     }
 
-    public static String getStoragePath(String hashcode) {
-        return objectsPath + hashcode.substring(0, 2) + File.separator + hashcode.substring(2);
-    }
-
     public static void setWorkingDirectory(String wd) {
         workingDirectory = wd;
         objectsPath = workingDirectory + wvcRootPath + "objects" + File.separator;
@@ -129,24 +120,8 @@ public class KeyValueStore {
         logsPath = workingDirectory + wvcRootPath + "logs" + File.separator;
     }
 
-    // 给定String类型的文件内容，进行Key-Value存储，并返回文件内容的hash值
-//    public static String kvStore(String value) {
-//        String hashcode = null;
-//
-//        try {
-//            // 以git的存储结构保存object
-//            hashcode = Hash.stringHash(value);
-//            String filepath = createObjectFile(hashcode);
-//
-//            // 写入文件内容
-//            BufferedWriter out = new BufferedWriter(new FileWriter(filepath));
-//            out.write(value);
-//            out.flush();
-//            out.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return hashcode;
-//    }
+    public static String getStoragePath(String hashcode) {
+        return objectsPath + hashcode.substring(0, 2) + File.separator + hashcode.substring(2);
+    }
 }
 
